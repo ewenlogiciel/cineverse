@@ -11,30 +11,16 @@
         </div>
 
         <div>
-          <label for="username" class="block text-sm font-medium text-gray-300 mb-2">
-            Nom d'utilisateur
-          </label>
-          <input
-            id="username"
-            v-model="form.username"
-            type="text"
-            required
-            class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
-            placeholder="John Doe"
-          />
-        </div>
-
-        <div>
           <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
             Email
           </label>
           <input
-            id="email"
-            v-model="form.email"
-            type="email"
-            required
-            class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
-            placeholder="votre@email.com"
+              id="email"
+              v-model="form.email"
+              type="email"
+              required
+              class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
+              placeholder="votre@email.com"
           />
         </div>
 
@@ -43,13 +29,13 @@
             Mot de passe
           </label>
           <input
-            id="password"
-            v-model="form.password"
-            type="password"
-            required
-            minlength="6"
-            class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
-            placeholder="••••••••"
+              id="password"
+              v-model="form.password"
+              type="password"
+              required
+              minlength="6"
+              class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
+              placeholder="••••••••"
           />
         </div>
 
@@ -58,19 +44,19 @@
             Confirmer le mot de passe
           </label>
           <input
-            id="confirmPassword"
-            v-model="form.confirmPassword"
-            type="password"
-            required
-            class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
-            placeholder="••••••••"
+              id="confirmPassword"
+              v-model="form.confirmPassword"
+              type="password"
+              required
+              class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
+              placeholder="••••••••"
           />
         </div>
 
         <button
-          type="submit"
-          :disabled="loading"
-          class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-3 px-4 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 disabled:hover:scale-100"
+            type="submit"
+            :disabled="loading"
+            class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-3 px-4 rounded-lg font-medium focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 disabled:hover:scale-100"
         >
           {{ loading ? 'Inscription...' : "S'inscrire" }}
         </button>
@@ -95,7 +81,6 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 const form = ref({
-  username: '',
   email: '',
   password: '',
   confirmPassword: '',
@@ -114,6 +99,8 @@ const handleRegister = async () => {
   error.value = null
 
   try {
+    // On extrait confirmPassword pour ne pas l'envoyer à l'API
+    // userData contient maintenant uniquement email et password
     const { confirmPassword, ...userData } = form.value
     await authStore.register(userData)
     router.push('/')

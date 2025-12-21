@@ -1,8 +1,18 @@
 import axios from 'axios'
 
-const GRAPHQL_ENDPOINT = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8319/api/graphql'
+// Utilise les chemins relatifs car Vite proxy redirige automatiquement vers le backend
+const API_BASE_URL = ''
+const GRAPHQL_ENDPOINT = import.meta.env.VITE_API_BASE_URL || '/api/graphql'
 
-// Client GraphQL
+// Client REST pour l'authentification
+export const restClient = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
+// Client GraphQL pour les requêtes GraphQL
 const graphqlClient = axios.create({
   baseURL: GRAPHQL_ENDPOINT,
   headers: {
@@ -10,7 +20,35 @@ const graphqlClient = axios.create({
   },
 })
 
-// Intercepteur pour ajouter le token JWT à chaque requête
+// Fonction pour gérer les erreurs d'authentification
+const handleAuthError = (error) => {
+  if (error.response?.status === 401) {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    window.location.href = '/login'
+  }
+  return Promise.reject(error)
+}
+
+// Intercepteur pour ajouter le token JWT à chaque requête REST
+restClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+// Intercepteur pour gérer les erreurs de réponse REST
+restClient.interceptors.response.use(
+  (response) => response,
+  handleAuthError
+)
+
+// Intercepteur pour ajouter le token JWT à chaque requête GraphQL
 graphqlClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token')
@@ -19,23 +57,13 @@ graphqlClient.interceptors.request.use(
     }
     return config
   },
-  (error) => {
-    return Promise.reject(error)
-  }
+  (error) => Promise.reject(error)
 )
 
-// Intercepteur pour gérer les erreurs de réponse
+// Intercepteur pour gérer les erreurs de réponse GraphQL
 graphqlClient.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Token expiré ou invalide
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
-      window.location.href = '/login'
-    }
-    return Promise.reject(error)
-  }
+  handleAuthError
 )
 
 // Fonction helper pour faire des requêtes GraphQL

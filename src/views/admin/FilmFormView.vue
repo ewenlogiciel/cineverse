@@ -1,74 +1,117 @@
 <template>
-  <div class="max-w-4xl mx-auto">
-    <h1 class="text-5xl font-bold bg-gradient-to-r from-red-500 to-purple-600 bg-clip-text text-transparent mb-8">
-      {{ isEditMode ? 'Modifier le film' : 'Nouveau film' }}
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-4xl font-bold bg-gradient-to-r from-red-500 to-purple-600 bg-clip-text text-transparent mb-8">
+      {{ isEditing ? 'Modifier le film' : 'Nouveau film' }}
     </h1>
 
-    <div class="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl shadow-2xl p-8">
-      <form @submit.prevent="handleSubmit" class="space-y-6">
-        <div v-if="error" class="bg-red-500/10 border border-red-500/50 text-red-400 px-4 py-3 rounded-lg backdrop-blur-sm">
-          {{ error }}
-        </div>
-
-        <div>
-          <label for="title" class="block text-sm font-medium text-gray-300 mb-2">
-            Titre *
-          </label>
-          <input
-            id="title"
-            v-model="form.title"
+    <form @submit.prevent="handleSubmit" class="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl p-8 space-y-6">
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Nom *</label>
+        <input
+            v-model="formData.name"
             type="text"
             required
-            class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
-            placeholder="Titre du film"
+            class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Description</label>
+        <textarea
+            v-model="formData.description"
+            rows="4"
+            class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+        ></textarea>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Durée (minutes) *</label>
+          <input
+              v-model.number="formData.duration"
+              type="number"
+              min="30"
+              required
+              class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
           />
+          <p class="text-xs text-gray-500 mt-1">Minimum 30 minutes</p>
         </div>
 
         <div>
-          <label for="categories" class="block text-sm font-medium text-gray-300 mb-2">
-            Catégories (IRI des catégories)
-          </label>
+          <label class="block text-sm font-medium text-gray-300 mb-2">Budget (€)</label>
           <input
-            id="categories"
-            v-model="categoriesInput"
-            type="text"
-            class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
-            placeholder="Ex: /api/categories/1, /api/categories/2"
-          />
-          <p class="text-xs text-gray-500 mt-1">Séparez les IRI par des virgules</p>
-        </div>
-
-        <div>
-          <label for="releaseDate" class="block text-sm font-medium text-gray-300 mb-2">
-            Date de création *
-          </label>
-          <input
-            id="releaseDate"
-            v-model="form.releaseDate"
-            type="datetime-local"
-            required
-            class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white transition-all"
+              v-model.number="formData.budget"
+              type="number"
+              min="0"
+              step="0.01"
+              class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
           />
         </div>
+      </div>
 
-        <div class="flex space-x-4 pt-4">
-          <button
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Date de sortie</label>
+        <input
+            v-model="formData.releaseDate"
+            type="date"
+            class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+        />
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Réalisateur</label>
+        <select
+            v-model="formData.director"
+            class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+        >
+          <option :value="null">Aucun</option>
+          <option v-for="director in directors" :key="director.id" :value="`/api/directors/${director.id}`">
+            {{ director.firstname }} {{ director.lastname }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Catégories</label>
+        <div class="space-y-2 max-h-48 overflow-y-auto bg-gray-800/50 p-4 rounded-lg">
+          <label v-for="category in categories" :key="category.id" class="flex items-center space-x-2">
+            <input
+                type="checkbox"
+                :value="`/api/categories/${category.id}`"
+                v-model="formData.categories"
+                class="rounded bg-gray-800 border-gray-700 text-red-600 focus:ring-red-500"
+            />
+            <span class="text-gray-300">{{ category.name }}</span>
+          </label>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-300 mb-2">Nombre d'entrées</label>
+        <input
+            v-model.number="formData.nbEntries"
+            type="number"
+            min="0"
+            class="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-red-500"
+        />
+      </div>
+
+      <div class="flex space-x-4">
+        <button
             type="submit"
-            :disabled="loading"
-            class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white py-3 px-4 rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 disabled:hover:scale-100"
-          >
-            {{ loading ? 'Enregistrement...' : (isEditMode ? 'Mettre à jour' : 'Créer le film') }}
-          </button>
-
-          <router-link
+            :disabled="filmsStore.loading"
+            class="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg disabled:opacity-50"
+        >
+          {{ filmsStore.loading ? 'Enregistrement...' : (isEditing ? 'Mettre à jour' : 'Créer') }}
+        </button>
+        <router-link
             to="/admin"
-            class="flex-1 bg-white/5 hover:bg-white/10 border border-gray-700 text-white py-3 px-4 rounded-lg font-medium text-center transition-all"
-          >
-            Annuler
-          </router-link>
-        </div>
-      </form>
-    </div>
+            class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-all text-center"
+        >
+          Annuler
+        </router-link>
+      </div>
+    </form>
   </div>
 </template>
 
@@ -76,71 +119,63 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useFilmsStore } from '@/stores/films'
+import { useDirectorsStore } from '@/stores/directors'
+import { useCategoriesStore } from '@/stores/categories'
 
 const route = useRoute()
 const router = useRouter()
 const filmsStore = useFilmsStore()
+const directorsStore = useDirectorsStore()
+const categoriesStore = useCategoriesStore()
 
-const isEditMode = computed(() => !!route.params.id && route.params.id !== 'new')
+const isEditing = computed(() => !!route.params.id)
 
-const form = ref({
-  title: '',
-  categories: [],
+const directors = computed(() => directorsStore.directors)
+const categories = computed(() => categoriesStore.categories)
+
+const formData = ref({
+  name: '',
+  description: '',
+  duration: null,
+  budget: null,
   releaseDate: '',
+  director: null,
+  categories: [],
+  nbEntries: null,
 })
 
-const categoriesInput = ref('')
-
-const loading = ref(false)
-const error = ref(null)
-
 const handleSubmit = async () => {
-  loading.value = true
-  error.value = null
-
   try {
-    // Convertir l'input des catégories en tableau
-    const categories = categoriesInput.value
-      ? categoriesInput.value.split(',').map(cat => cat.trim()).filter(cat => cat)
-      : []
-
-    const filmData = {
-      ...form.value,
-      categories,
-      // Convertir la date au format attendu par l'API
-      releaseDate: form.value.releaseDate.replace('T', ' ') + ':00',
-    }
-
-    if (isEditMode.value) {
-      await filmsStore.updateFilm(route.params.id, filmData)
+    if (isEditing.value) {
+      await filmsStore.updateFilm(route.params.id, formData.value)
     } else {
-      await filmsStore.createFilm(filmData)
+      await filmsStore.createFilm(formData.value)
     }
     router.push('/admin')
   } catch (err) {
-    console.error('Error:', err)
-    error.value = err.response?.data?.message || err.message || 'Erreur lors de la sauvegarde'
-  } finally {
-    loading.value = false
+    alert('Erreur lors de l\'enregistrement du film')
   }
 }
 
 onMounted(async () => {
-  if (isEditMode.value) {
-    try {
-      const film = await filmsStore.fetchFilm(route.params.id)
-      form.value = {
-        title: film.title || '',
-        categories: film.categories || [],
-        releaseDate: film.releaseDate ? film.releaseDate.split(' ').join('T').substring(0, 16) : '',
-      }
+  // Charger les réalisateurs et catégories
+  await Promise.all([
+    directorsStore.fetchDirectors(),
+    categoriesStore.fetchCategories()
+  ])
 
-      // Afficher les catégories comme IRIs
-      if (film.categories && Array.isArray(film.categories)) {
-        categoriesInput.value = film.categories.map(cat => cat.id || cat).join(', ')
-      }
-    } catch (err) {
-      error.value = 'Erreur lors du chargement du film'
+  // Si mode édition, charger le film
+  if (isEditing.value) {
+    const film = await filmsStore.fetchFilm(route.params.id)
+    formData.value = {
+      name: film.name || '',
+      description: film.description || '',
+      duration: film.duration,
+      budget: film.budget,
+      releaseDate: film.releaseDate || '',
+      director: film.director?.id || null,
+      categories: film.categories?.map(cat => cat.id) || [],
+      nbEntries: film.nbEntries,
     }
   }
 })

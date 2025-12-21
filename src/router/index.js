@@ -44,6 +44,82 @@ const router = createRouter({
       component: () => import('@/views/admin/FilmFormView.vue'),
       meta: { requiresAdmin: true },
     },
+    // Actors
+    {
+      path: '/admin/actors',
+      name: 'admin-actors',
+      component: () => import('@/views/admin/AdminActorsView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/actors/new',
+      name: 'admin-actor-create',
+      component: () => import('@/views/admin/ActorFormView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/actors/:id/edit',
+      name: 'admin-actor-edit',
+      component: () => import('@/views/admin/ActorFormView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    // Categories
+    {
+      path: '/admin/categories',
+      name: 'admin-categories',
+      component: () => import('@/views/admin/AdminCategoriesView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/categories/new',
+      name: 'admin-category-create',
+      component: () => import('@/views/admin/CategoryFormView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/categories/:id/edit',
+      name: 'admin-category-edit',
+      component: () => import('@/views/admin/CategoryFormView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    // Directors
+    {
+      path: '/admin/directors',
+      name: 'admin-directors',
+      component: () => import('@/views/admin/AdminDirectorsView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/directors/new',
+      name: 'admin-director-create',
+      component: () => import('@/views/admin/DirectorFormView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/directors/:id/edit',
+      name: 'admin-director-edit',
+      component: () => import('@/views/admin/DirectorFormView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    // Users
+    {
+      path: '/admin/users',
+      name: 'admin-users',
+      component: () => import('@/views/admin/AdminUsersView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/users/new',
+      name: 'admin-user-create',
+      component: () => import('@/views/admin/UserFormView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/users/:id/edit',
+      name: 'admin-user-edit',
+      component: () => import('@/views/admin/UserFormView.vue'),
+      meta: { requiresAdmin: true },
+    },
   ],
 })
 

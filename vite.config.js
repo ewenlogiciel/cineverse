@@ -21,6 +21,16 @@ export default defineConfig({
         target: 'http://localhost:8319',
         changeOrigin: true,
         secure: false,
+      },
+      '/auth': {
+        target: 'http://localhost:8319',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/register': {
+        target: 'http://localhost:8319',
+        changeOrigin: true,
+        secure: false,
       }
     }
   }

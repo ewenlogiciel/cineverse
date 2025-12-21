@@ -11,16 +11,16 @@
   </div>
 
   <div v-else-if="film" class="max-w-7xl mx-auto">
-    <!-- Film header -->
     <div class="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl shadow-2xl overflow-hidden mb-8">
       <div class="md:flex">
         <div class="md:w-1/3">
           <div class="relative h-96 md:h-full bg-gradient-to-br from-gray-800 to-gray-900">
             <img
-              v-if="posterUrl"
-              :src="posterUrl"
-              :alt="film.title"
-              class="w-full h-full object-cover"
+                v-if="posterUrl && !imageError"
+                :src="posterUrl"
+                :alt="film.name"
+                class="w-full h-full object-cover"
+                @error="imageError = true"
             />
             <div v-else class="w-full h-full flex items-center justify-center">
               <span class="text-gray-600 text-9xl">🎬</span>
@@ -30,39 +30,31 @@
         </div>
 
         <div class="md:w-2/3 p-8">
-          <h1 class="text-5xl font-bold bg-gradient-to-r from-red-500 to-purple-600 bg-clip-text text-transparent mb-6">
-            {{ film.title }}
+          <h1 class="text-5xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent mb-6">
+            {{ film.name }}
           </h1>
-
-          <div class="flex items-center mb-6">
-            <div class="flex items-center bg-black/40 backdrop-blur-sm rounded-lg px-4 py-2">
-              <span class="text-yellow-400 text-3xl mr-2">⭐</span>
-              <span class="text-3xl font-bold text-white">
-                {{ film.averageRating ? film.averageRating.toFixed(1) : 'N/A' }}
-              </span>
-              <span class="text-gray-400 ml-2 text-sm">
-                ({{ film.ratingsCount || 0 }} avis)
-              </span>
-            </div>
-          </div>
 
           <div class="space-y-3 text-gray-300 mb-6">
             <p v-if="film.releaseDate" class="flex items-center">
-              <span class="font-semibold text-white w-32">Date de sortie:</span>
+              <span class="font-semibold text-white w-32">Date de sortie :</span>
               <span>{{ formatDate(film.releaseDate) }}</span>
             </p>
-            <p v-if="film.author" class="flex items-center">
-              <span class="font-semibold text-white w-32">Auteur:</span>
-              <span>{{ film.author.username || film.author.email }}</span>
-            </p>
             <p v-if="film.director" class="flex items-center">
-              <span class="font-semibold text-white w-32">Réalisateur:</span>
-              <span>{{ film.director }}</span>
+              <span class="font-semibold text-white w-32">Réalisateur :</span>
+              <span>{{ film.director.firstname }} {{ film.director.lastname }}</span>
             </p>
-            <p v-if="film.genre" class="flex items-center">
-              <span class="font-semibold text-white w-32">Genre:</span>
-              <span>{{ film.genre }}</span>
-            </p>
+            <div v-if="film.categories && film.categories.length > 0" class="flex items-start">
+              <span class="font-semibold text-white w-32 flex-shrink-0">Genre :</span>
+              <div class="flex flex-wrap gap-2">
+                <span
+                    v-for="category in film.categories"
+                    :key="category.id"
+                    class="px-2 py-0.5 bg-red-500/10 border border-red-500/30 rounded text-xs text-red-400"
+                >
+                  {{ category.name }}
+                </span>
+              </div>
+            </div>
           </div>
 
           <div class="mb-6">
@@ -72,33 +64,16 @@
             </p>
           </div>
 
-          <!-- Rating section (authenticated users only) -->
-          <div v-if="authStore.isAuthenticated" class="mb-6 bg-white/5 rounded-lg p-4 border border-gray-800">
-            <h3 class="text-lg font-bold text-white mb-3">Votre note</h3>
-            <div class="flex items-center space-x-2">
-              <button
-                v-for="star in 5"
-                :key="star"
-                @click="rateFilm(star)"
-                class="text-4xl focus:outline-none transition transform hover:scale-125"
-                :class="star <= userRating ? 'text-yellow-400' : 'text-gray-600'"
-              >
-                ⭐
-              </button>
-            </div>
-          </div>
-
-          <!-- Admin actions -->
           <div v-if="authStore.isAdmin" class="flex space-x-4">
             <router-link
-              :to="`/admin/films/${film.id}/edit`"
-              class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all transform hover:scale-105"
+                :to="`/admin/films/${film.id}/edit`"
+                class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all transform hover:scale-105"
             >
               Modifier
             </router-link>
             <button
-              @click="handleDelete"
-              class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all transform hover:scale-105"
+                @click="handleDelete"
+                class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all transform hover:scale-105"
             >
               Supprimer
             </button>
@@ -107,23 +82,21 @@
       </div>
     </div>
 
-    <!-- Comments section -->
     <div class="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl shadow-2xl p-8">
       <h2 class="text-3xl font-bold text-white mb-6">Commentaires</h2>
 
-      <!-- Add comment form (authenticated users only) -->
       <div v-if="authStore.isAuthenticated" class="mb-8">
         <form @submit.prevent="submitComment" class="space-y-4">
           <textarea
-            v-model="newComment"
-            rows="4"
-            placeholder="Écrire un commentaire..."
-            class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
+              v-model="newComment"
+              rows="4"
+              placeholder="Écrire un commentaire..."
+              class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
           ></textarea>
           <button
-            type="submit"
-            :disabled="!newComment.trim()"
-            class="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 disabled:hover:scale-100"
+              type="submit"
+              :disabled="!newComment.trim()"
+              class="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
           >
             Publier le commentaire
           </button>
@@ -139,26 +112,25 @@
         </p>
       </div>
 
-      <!-- Comments list -->
       <div class="space-y-6">
         <div
-          v-for="comment in comments"
-          :key="comment.id"
-          class="border-b border-gray-800 pb-6 last:border-b-0"
+            v-for="comment in comments"
+            :key="comment.id"
+            class="border-b border-gray-800 pb-6 last:border-b-0"
         >
           <div class="flex items-start justify-between mb-3">
             <div>
               <p class="font-semibold text-white text-lg">
-                {{ comment.author?.username || comment.author?.email }}
+                {{ comment.user?.username || comment.user?.email || 'Utilisateur anonyme' }}
               </p>
               <p class="text-sm text-gray-500">
                 {{ formatDate(comment.createdAt) }}
               </p>
             </div>
             <button
-              v-if="authStore.user?.id === comment.author?.id || authStore.isAdmin"
-              @click="deleteComment(comment.id)"
-              class="text-red-500 hover:text-red-400 text-sm font-medium transition-colors"
+                v-if="authStore.user?.id === comment.user?.id || authStore.isAdmin"
+                @click="deleteComment(comment.id)"
+                class="text-red-500 hover:text-red-400 text-sm font-medium transition-colors"
             >
               Supprimer
             </button>
@@ -180,7 +152,6 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import commentService from '@/services/commentService'
-import ratingService from '@/services/ratingService'
 import filmService from '@/services/filmService'
 import tmdbService from '@/services/tmdbService'
 
@@ -190,13 +161,14 @@ const authStore = useAuthStore()
 
 const film = ref(null)
 const comments = ref([])
-const userRating = ref(0)
 const newComment = ref('')
 const loading = ref(true)
 const error = ref(null)
 const posterUrl = ref(null)
+const imageError = ref(false)
 
 const formatDate = (date) => {
+  if (!date) return ''
   return new Date(date).toLocaleDateString('fr-FR', {
     year: 'numeric',
     month: 'long',
@@ -204,34 +176,30 @@ const formatDate = (date) => {
   })
 }
 
-const rateFilm = async (rating) => {
-  try {
-    await ratingService.rateFilm(route.params.id, rating)
-    userRating.value = rating
-    // Refresh film data to update average rating
-    await loadFilm()
-  } catch (err) {
-    console.error('Error rating film:', err)
-  }
-}
-
 const submitComment = async () => {
+  if (!newComment.value.trim()) return
+
   try {
-    await commentService.createComment(route.params.id, {
+    const commentData = {
       content: newComment.value,
-    })
+      movie: `/api/movies/${route.params.id}`,
+      user: `/api/users/${authStore.user.id}` // On utilise 'user' et non 'author'
+    }
+
+    await commentService.createComment(commentData)
     newComment.value = ''
     await loadComments()
   } catch (err) {
-    console.error('Error creating comment:', err)
+    console.error('Erreur:', err.response?.data)
+    alert('Erreur lors de l\'envoi.')
   }
 }
 
 const deleteComment = async (commentId) => {
   if (!confirm('Voulez-vous vraiment supprimer ce commentaire?')) return
-
   try {
-    await commentService.deleteComment(commentId)
+    const id = commentId.toString().includes('/') ? commentId.split('/').pop() : commentId
+    await commentService.deleteComment(id)
     await loadComments()
   } catch (err) {
     console.error('Error deleting comment:', err)
@@ -240,7 +208,6 @@ const deleteComment = async (commentId) => {
 
 const handleDelete = async () => {
   if (!confirm('Voulez-vous vraiment supprimer ce film?')) return
-
   try {
     await filmService.deleteFilm(route.params.id)
     router.push('/')
@@ -252,17 +219,25 @@ const handleDelete = async () => {
 const loadFilm = async () => {
   try {
     film.value = await filmService.getFilm(route.params.id)
+    const movieTitle = film.value.name || film.value.title
 
-    // Charger l'affiche depuis TMDB
-    if (film.value.poster) {
-      posterUrl.value = film.value.poster
+    const hasValidPoster = film.value.image &&
+        !film.value.image.includes('placeholder') &&
+        !film.value.image.includes('via.placeholder')
+
+    if (hasValidPoster) {
+      posterUrl.value = film.value.image
     } else {
-      const results = await tmdbService.searchMovie(film.value.title)
-      if (results && results.length > 0) {
-        const tmdbPoster = tmdbService.getPosterUrl(results[0].poster_path, 'w780')
-        if (tmdbPoster) {
-          posterUrl.value = tmdbPoster
+      try {
+        const results = await tmdbService.searchMovie(movieTitle)
+        if (results && results.length > 0) {
+          const tmdbPoster = tmdbService.getPosterUrl(results[0].poster_path, 'w780')
+          if (tmdbPoster) {
+            posterUrl.value = tmdbPoster
+          }
         }
+      } catch (tmdbError) {
+        console.error('Error fetching TMDB poster:', tmdbError)
       }
     }
   } catch (err) {
@@ -272,32 +247,22 @@ const loadFilm = async () => {
 }
 
 const loadComments = async () => {
-  try {
-    comments.value = await commentService.getComments(route.params.id)
-  } catch (err) {
-    console.error('Error loading comments:', err)
+  // Les commentaires sont déjà dans film.value.comments grâce aux Groups !
+  if (film.value && film.value.comments) {
+    comments.value = film.value.comments;
   }
-}
-
-const loadUserRating = async () => {
-  if (!authStore.isAuthenticated) return
-
-  try {
-    const response = await ratingService.getUserRating(route.params.id)
-    userRating.value = response.rating || 0
-  } catch (err) {
-    console.error('Error loading user rating:', err)
-  }
-}
+};
 
 onMounted(async () => {
   loading.value = true
   try {
+    // Plus de loadUserRating ici
     await Promise.all([
       loadFilm(),
-      loadComments(),
-      loadUserRating(),
+      loadComments()
     ])
+  } catch (err) {
+    console.error('Erreur au montage:', err)
   } finally {
     loading.value = false
   }
