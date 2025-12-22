@@ -4,12 +4,21 @@
       <div class="flex items-center justify-between h-20">
 
         <div class="flex items-center space-x-8 lg:space-x-12 flex-1">
-          <router-link to="/" class="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent transition-all hover:opacity-80 shrink-0">
+          <router-link
+              to="/"
+              @click="resetSearch"
+              class="text-3xl font-bold bg-gradient-to-r from-red-600 to-red-400 bg-clip-text text-transparent transition-all hover:opacity-80 shrink-0"
+          >
             cineverse
           </router-link>
 
           <div class="hidden lg:flex items-center space-x-1 shrink-0">
-            <router-link to="/" class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-lg transition-all" active-class="text-white">
+            <router-link
+                to="/"
+                @click="resetSearch"
+                class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-lg transition-all"
+                active-class="text-white"
+            >
               Accueil
             </router-link>
 
@@ -60,9 +69,7 @@
                     <div class="flex mt-2 gap-2">
                       <button
                           @click="updateSort('desc')"
-                          :class="sortBy === 'desc'
-      ? 'bg-red-600 border-red-600 text-white'
-      : 'bg-white/5 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'"
+                          :class="sortBy === 'desc' ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'"
                           class="flex-1 px-2 py-1 rounded text-xs border transition-all"
                       >
                         Récent
@@ -70,9 +77,7 @@
 
                       <button
                           @click="updateSort('asc')"
-                          :class="sortBy === 'asc'
-      ? 'bg-red-600 border-red-600 text-white'
-      : 'bg-white/5 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'"
+                          :class="sortBy === 'asc' ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'"
                           class="flex-1 px-2 py-1 rounded text-xs border transition-all"
                       >
                         Ancien
@@ -86,14 +91,9 @@
                         @click="isDirectorDropdownOpen = !isDirectorDropdownOpen"
                         class="w-full mt-2 bg-black border border-gray-700 text-xs text-gray-300 rounded-lg px-3 py-2 flex justify-between items-center hover:border-gray-500 transition-colors"
                     >
-    <span class="truncate">
-      {{
-        selectedDirector
-            ? directorsStore.directors.find(d => d.id === selectedDirector)?.name
-            : 'Tous les réalisateurs'
-      }}
-    </span>
-
+                      <span class="truncate">
+                        {{ selectedDirector ? directorsStore.directors.find(d => d.id === selectedDirector)?.name : 'Tous les réalisateurs' }}
+                      </span>
                       <svg
                           class="w-4 h-4 text-gray-500 transition-transform duration-200"
                           :class="{ 'rotate-180': isDirectorDropdownOpen }"
@@ -126,12 +126,9 @@
                       </button>
                     </div>
 
-                    <div
-                        v-if="isDirectorDropdownOpen"
-                        class="fixed inset-0 z-40"
-                        @click="isDirectorDropdownOpen = false"
-                    ></div>
-                  </div>                </div>
+                    <div v-if="isDirectorDropdownOpen" class="fixed inset-0 z-40" @click="isDirectorDropdownOpen = false"></div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -163,12 +160,12 @@
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useFilmsStore } from '@/stores/films'
-import { useDirectorsStore } from '@/stores/directors' // Ajouté
+import { useDirectorsStore } from '@/stores/directors'
 import { useRouter, useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const filmsStore = useFilmsStore()
-const directorsStore = useDirectorsStore() // Ajouté
+const directorsStore = useDirectorsStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -178,7 +175,6 @@ const sortBy = ref(null)
 const isDirectorDropdownOpen = ref(false)
 let timeout = null
 
-// Charger les réalisateurs au montage pour remplir le select
 onMounted(() => {
   directorsStore.fetchDirectors()
 })
@@ -195,13 +191,22 @@ const updateSort = (order) => {
   executeSearch()
 }
 
-const executeSearch = () => {
-  // ... redirection ...
+// === NOUVELLE FONCTION AJOUTÉE ===
+const resetSearch = () => {
+  // 1. Réinitialiser les variables locales
+  searchQuery.value = ''
+  selectedDirector.value = null
+  sortBy.value = null
 
+  // 2. Appeler le store avec un objet vide pour récupérer les films par défaut
+  filmsStore.fetchFilms({})
+}
+
+const executeSearch = () => {
   filmsStore.fetchFilms({
     search: searchQuery.value.trim() || undefined,
-    director: selectedDirector.value || undefined, // Envoie l'ID (ex: 5)
-    sort: sortBy.value // 'asc' ou 'desc'
+    director: selectedDirector.value || undefined,
+    sort: sortBy.value
   })
 }
 
@@ -212,7 +217,7 @@ const handleLogout = () => {
 
 const selectDirector = (id) => {
   selectedDirector.value = id
-  isDirectorDropdownOpen.value = false // On ferme le menu après le choix
+  isDirectorDropdownOpen.value = false
   executeSearch()
 }
 </script>

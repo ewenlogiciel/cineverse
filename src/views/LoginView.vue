@@ -73,6 +73,8 @@ const form = ref({
 const loading = ref(false)
 const error = ref(null)
 
+// Dans LoginView.vue
+
 const handleLogin = async () => {
   loading.value = true
   error.value = null
@@ -81,7 +83,11 @@ const handleLogin = async () => {
     await authStore.login(form.value)
     router.push('/')
   } catch (err) {
-    error.value = err.response?.data?.message || 'Erreur lors de la connexion'
+    if (err.response?.status === 401) {
+      error.value = "Identifiants incorrects"
+    } else {
+      error.value = err.response?.data?.message || 'Erreur lors de la connexion'
+    }
   } finally {
     loading.value = false
   }

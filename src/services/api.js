@@ -25,58 +25,63 @@ const handleAuthError = (error) => {
   if (error.response?.status === 401) {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
-    window.location.href = '/login'
+
+    // CORRECTION ICI : On ne redirige pas si on est déjà sur la page de login
+    // Cela permet à la LoginView de récupérer l'erreur et de l'afficher
+    if (!window.location.pathname.includes('/login')) {
+      window.location.href = '/login'
+    }
   }
   return Promise.reject(error)
 }
 
 // Intercepteur pour ajouter le token JWT à chaque requête REST
 restClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
+    (config) => {
+      const token = localStorage.getItem('token')
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+      return config
+    },
+    (error) => Promise.reject(error)
 )
 
 // Intercepteur pour gérer les erreurs de réponse REST
 restClient.interceptors.response.use(
-  (response) => response,
-  handleAuthError
+    (response) => response,
+    handleAuthError
 )
 
 // Intercepteur pour ajouter le token JWT à chaque requête GraphQL
 graphqlClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
+    (config) => {
+      const token = localStorage.getItem('token')
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+      }
+      return config
+    },
+    (error) => Promise.reject(error)
 )
 
 // Intercepteur pour gérer les erreurs de réponse GraphQL
 graphqlClient.interceptors.response.use(
-  (response) => response,
-  handleAuthError
+    (response) => response,
+    handleAuthError
 )
 
 // Fonction helper pour faire des requêtes GraphQL
 export const graphqlRequest = async (query, variables = {}) => {
   try {
-    console.log('GraphQL Request:', { query, variables })
+    // console.log('GraphQL Request:', { query, variables }) // Commenté pour nettoyer la console
 
     const response = await graphqlClient.post('', {
       query,
       variables,
     })
 
-    console.log('GraphQL Response:', response.data)
+    // console.log('GraphQL Response:', response.data)
 
     if (response.data.errors) {
       console.error('GraphQL Errors:', response.data.errors)
