@@ -4,6 +4,14 @@
 
 Application frontend Vue.js 3 pour la gestion et consultation de films, avec authentification JWT et système de rôles.
 
+
+## Backend (API)
+
+Ce projet frontend nécessite le backend Symfony pour fonctionner.
+
+* **Lien du dépôt :** [https://github.com/ewenlogiciel/wr506d](https://github.com/ewenlogiciel/wr506d)
+* ⚠️ **Important :** Veuillez vous placer sur la branche **`develop`** du dépôt backend.
+
 ## Installation
 
 1. Cloner le projet et installer les dépendances:

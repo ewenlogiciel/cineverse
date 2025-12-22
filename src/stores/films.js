@@ -8,17 +8,33 @@ export const useFilmsStore = defineStore('films', () => {
   const loading = ref(false)
   const error = ref(null)
 
+  /**
+   * Fonction principale pour récupérer les films.
+   * Elle gère à la fois le chargement initial, la recherche et les filtres.
+   * @param {Object} params - { search: string, director: string|int, sort: 'asc'|'desc' }
+   */
   const fetchFilms = async (params = {}) => {
     loading.value = true
     error.value = null
     try {
+      // On appelle le service qui va construire la requête GraphQL
+      // avec les bons filtres (name, director, order)
       films.value = await filmService.getFilms(params)
     } catch (err) {
-      error.value = err.message
-      throw err
+      error.value = err.message || "Une erreur est survenue lors du chargement des films."
+      // On log l'erreur pour le débogage mais on évite de faire planter l'app
+      console.error(err)
     } finally {
       loading.value = false
     }
+  }
+
+  /**
+   * Alias pour la recherche textuelle simple.
+   * Redirige vers fetchFilms pour utiliser la même logique centrale.
+   */
+  const searchFilms = async (query) => {
+    return fetchFilms({ search: query })
   }
 
   const fetchFilm = async (id) => {
@@ -55,10 +71,12 @@ export const useFilmsStore = defineStore('films', () => {
     error.value = null
     try {
       const updatedFilm = await filmService.updateFilm(id, filmData)
+      // Mise à jour locale de la liste pour éviter de recharger
       const index = films.value.findIndex(f => f.id === id)
       if (index !== -1) {
         films.value[index] = updatedFilm
       }
+      // Mise à jour du film courant s'il est affiché
       if (currentFilm.value?.id === id) {
         currentFilm.value = updatedFilm
       }
@@ -76,23 +94,11 @@ export const useFilmsStore = defineStore('films', () => {
     error.value = null
     try {
       await filmService.deleteFilm(id)
+      // Suppression locale
       films.value = films.value.filter(f => f.id !== id)
       if (currentFilm.value?.id === id) {
         currentFilm.value = null
       }
-    } catch (err) {
-      error.value = err.message
-      throw err
-    } finally {
-      loading.value = false
-    }
-  }
-
-  const searchFilms = async (query) => {
-    loading.value = true
-    error.value = null
-    try {
-      films.value = await filmService.searchFilms(query)
     } catch (err) {
       error.value = err.message
       throw err
@@ -107,10 +113,10 @@ export const useFilmsStore = defineStore('films', () => {
     loading,
     error,
     fetchFilms,
+    searchFilms, // Gardé pour compatibilité, mais utilise fetchFilms en interne
     fetchFilm,
     createFilm,
     updateFilm,
     deleteFilm,
-    searchFilms,
   }
 })

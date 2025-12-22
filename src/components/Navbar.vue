@@ -58,24 +58,80 @@
                   <div>
                     <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Date de sortie</label>
                     <div class="flex mt-2 gap-2">
-                      <button @click="updateSort('desc')" :class="sortBy === 'desc' ? 'bg-red-600 text-white' : 'bg-white/5 text-gray-400'" class="flex-1 px-3 py-1.5 text-xs rounded-lg transition-all">Récent</button>
-                      <button @click="updateSort('asc')" :class="sortBy === 'asc' ? 'bg-red-600 text-white' : 'bg-white/5 text-gray-400'" class="flex-1 px-3 py-1.5 text-xs rounded-lg transition-all">Ancien</button>
+                      <button
+                          @click="updateSort('desc')"
+                          :class="sortBy === 'desc'
+      ? 'bg-red-600 border-red-600 text-white'
+      : 'bg-white/5 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'"
+                          class="flex-1 px-2 py-1 rounded text-xs border transition-all"
+                      >
+                        Récent
+                      </button>
+
+                      <button
+                          @click="updateSort('asc')"
+                          :class="sortBy === 'asc'
+      ? 'bg-red-600 border-red-600 text-white'
+      : 'bg-white/5 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-white'"
+                          class="flex-1 px-2 py-1 rounded text-xs border transition-all"
+                      >
+                        Ancien
+                      </button>
                     </div>
                   </div>
-                  <div>
+                  <div class="relative">
                     <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Réalisateur</label>
-                    <select
-                        v-model="selectedDirector"
-                        @change="executeSearch"
-                        class="w-full mt-2 bg-black border border-gray-700 text-xs text-gray-300 rounded-lg px-3 py-2 outline-none focus:border-gray-500"
+
+                    <button
+                        @click="isDirectorDropdownOpen = !isDirectorDropdownOpen"
+                        class="w-full mt-2 bg-black border border-gray-700 text-xs text-gray-300 rounded-lg px-3 py-2 flex justify-between items-center hover:border-gray-500 transition-colors"
                     >
-                      <option :value="null">Tous les réalisateurs</option>
-                      <option v-for="dir in directorsStore.directors" :key="dir.id" :value="dir.id">
+    <span class="truncate">
+      {{
+        selectedDirector
+            ? directorsStore.directors.find(d => d.id === selectedDirector)?.name
+            : 'Tous les réalisateurs'
+      }}
+    </span>
+
+                      <svg
+                          class="w-4 h-4 text-gray-500 transition-transform duration-200"
+                          :class="{ 'rotate-180': isDirectorDropdownOpen }"
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    <div
+                        v-if="isDirectorDropdownOpen"
+                        class="absolute left-0 right-0 mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto"
+                    >
+                      <button
+                          @click="selectDirector(null)"
+                          class="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-gray-800 hover:text-white transition-colors border-b border-gray-800"
+                          :class="{ 'text-red-500 font-bold': selectedDirector === null }"
+                      >
+                        Tous les réalisateurs
+                      </button>
+
+                      <button
+                          v-for="dir in directorsStore.directors"
+                          :key="dir.id"
+                          @click="selectDirector(dir.id)"
+                          class="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+                          :class="{ 'text-red-500 font-bold': selectedDirector === dir.id }"
+                      >
                         {{ dir.name }}
-                      </option>
-                    </select>
-                  </div>
-                </div>
+                      </button>
+                    </div>
+
+                    <div
+                        v-if="isDirectorDropdownOpen"
+                        class="fixed inset-0 z-40"
+                        @click="isDirectorDropdownOpen = false"
+                    ></div>
+                  </div>                </div>
               </div>
             </div>
           </div>
@@ -118,7 +174,8 @@ const route = useRoute()
 
 const searchQuery = ref('')
 const selectedDirector = ref(null)
-const sortBy = ref('desc')
+const sortBy = ref(null)
+const isDirectorDropdownOpen = ref(false)
 let timeout = null
 
 // Charger les réalisateurs au montage pour remplir le select
@@ -139,26 +196,23 @@ const updateSort = (order) => {
 }
 
 const executeSearch = () => {
-  if (route.path !== '/' && route.name !== 'films') {
-    router.push('/')
-  }
+  // ... redirection ...
 
-  // Si l'utilisateur a tapé du texte et n'a pas sélectionné de filtre, on utilise la recherche simple
-  if (searchQuery.value.trim() && !selectedDirector.value) {
-    filmsStore.searchFilms(searchQuery.value)
-  } else {
-    // Sinon on utilise fetchFilms avec les paramètres
-    // Note : Vérifie si ton API attend "director" ou "director_id"
-    filmsStore.fetchFilms({
-      director: selectedDirector.value || undefined,
-      sort: sortBy.value === 'desc' ? 'recent' : 'old',
-      search: searchQuery.value.trim() || undefined
-    })
-  }
+  filmsStore.fetchFilms({
+    search: searchQuery.value.trim() || undefined,
+    director: selectedDirector.value || undefined, // Envoie l'ID (ex: 5)
+    sort: sortBy.value // 'asc' ou 'desc'
+  })
 }
 
 const handleLogout = () => {
   authStore.logout()
   router.push('/')
+}
+
+const selectDirector = (id) => {
+  selectedDirector.value = id
+  isDirectorDropdownOpen.value = false // On ferme le menu après le choix
+  executeSearch()
 }
 </script>

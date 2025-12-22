@@ -2,7 +2,7 @@
   <div class="max-w-[90rem] mx-auto px-4 py-8">
 
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-5xl font-bold bg-gradient-to-r from-red-500 to-purple-600 bg-clip-text text-transparent">
+      <h1 class="text-5xl font-bold bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent">
         Gestion des Films
       </h1>
       <router-link

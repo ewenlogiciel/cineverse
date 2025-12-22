@@ -17,7 +17,7 @@
     </div>
 
     <div class="p-6">
-      <h3 class="text-2xl font-bold text-white mb-3 truncate group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-red-500 group-hover:to-purple-600 group-hover:bg-clip-text transition-all">
+      <h3 class="text-2xl font-bold text-white mb-3 truncate group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-red-500 group-hover:to-red-400 group-hover:bg-clip-text transition-all">
         {{ film.title }}
       </h3>
 

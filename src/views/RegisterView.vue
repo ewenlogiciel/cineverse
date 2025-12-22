@@ -1,7 +1,7 @@
 <template>
   <div class="max-w-md mx-auto mt-20">
     <div class="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl shadow-2xl p-8 backdrop-blur-sm">
-      <h2 class="text-4xl font-bold bg-gradient-to-r from-red-500 to-purple-600 bg-clip-text text-transparent mb-8 text-center">
+      <h2 class="text-4xl font-bold bg-gradient-to-r from-red-500 to-red-400 bg-clip-text text-transparent mb-8 text-center">
         Inscription
       </h2>
 

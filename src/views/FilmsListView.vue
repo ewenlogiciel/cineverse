@@ -25,49 +25,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { useFilmsStore } from '@/stores/films'
 import FilmCard from '@/components/FilmCard.vue'
 
 const filmsStore = useFilmsStore()
-const searchQuery = ref('')
-const filters = ref({
-  author: '',
-  sortBy: 'recent',
-})
 
-const authors = ref([])
-
-let searchTimeout = null
-
-const handleSearch = () => {
-  clearTimeout(searchTimeout)
-  searchTimeout = setTimeout(() => {
-    if (searchQuery.value.trim()) {
-      filmsStore.searchFilms(searchQuery.value)
-    } else {
-      applyFilters()
-    }
-  }, 500)
-}
-
-const applyFilters = () => {
-  const params = {}
-
-  if (filters.value.author) {
-    params.author = filters.value.author
+onMounted(() => {
+  // IMPORTANT : On ne charge les films que si la liste est vide.
+  // Cela évite d'écraser une recherche qui viendrait d'être faite par la NavBar
+  // juste avant la navigation vers cette page.
+  if (filmsStore.films.length === 0) {
+    filmsStore.fetchFilms()
   }
-
-  if (filters.value.sortBy) {
-    params.sort = filters.value.sortBy
-  }
-
-  filmsStore.fetchFilms(params)
-}
-
-onMounted(async () => {
-  await filmsStore.fetchFilms()
-  // TODO: Fetch authors list for filter
-  // authors.value = await authService.getAuthors()
 })
 </script>
