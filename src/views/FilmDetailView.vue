@@ -247,9 +247,14 @@ const loadFilm = async () => {
 }
 
 const loadComments = async () => {
-  // Les commentaires sont déjà dans film.value.comments grâce aux Groups !
-  if (film.value && film.value.comments) {
-    comments.value = film.value.comments;
+  try {
+    const filmId = route.params.id
+    console.log('🔍 Chargement des commentaires pour le film ID:', filmId)
+    const loadedComments = await commentService.getComments(filmId)
+    console.log('📝 Commentaires récupérés:', loadedComments)
+    comments.value = loadedComments
+  } catch (err) {
+    console.error('❌ Erreur lors du chargement des commentaires:', err)
   }
 };
 
