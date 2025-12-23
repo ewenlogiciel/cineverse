@@ -96,10 +96,27 @@ const handleSubmit = async () => {
   }
 }
 
+const formatDateForInput = (isoDate) => {
+  if (!isoDate) return ''
+  // Convertit une date ISO en format datetime-local (YYYY-MM-DDTHH:mm)
+  const date = new Date(isoDate)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day}T${hours}:${minutes}`
+}
+
 onMounted(async () => {
   if (isEditing.value) {
     const director = await directorsStore.fetchDirector(route.params.id)
-    formData.value = { ...director }
+    formData.value = {
+      lastname: director.lastname,
+      firstname: director.firstname,
+      dob: formatDateForInput(director.dob),
+      dod: formatDateForInput(director.dod)
+    }
   }
 })
 </script>

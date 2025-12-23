@@ -1,6 +1,8 @@
 <script setup>
 import Navbar from '@/components/Navbar.vue'
 import Footer from "@/components/Footer.vue";
+import ToastNotifications from '@/components/ToastNotifications.vue'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 </script>
 
 <template>
@@ -11,6 +13,9 @@ import Footer from "@/components/Footer.vue";
     </main>
     <Footer />
 
+    <!-- Système de notifications -->
+    <ToastNotifications />
+    <ConfirmModal />
   </div>
 </template>
 

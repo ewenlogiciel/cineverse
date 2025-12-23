@@ -82,6 +82,25 @@ const router = createRouter({
       component: () => import('@/views/admin/CategoryFormView.vue'),
       meta: { requiresAdmin: true },
     },
+    // Comments
+    {
+      path: '/admin/comments',
+      name: 'admin-comments',
+      component: () => import('@/views/admin/AdminCommentsView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/comments/new',
+      name: 'admin-comment-create',
+      component: () => import('@/views/admin/CommentFormView.vue'),
+      meta: { requiresAdmin: true },
+    },
+    {
+      path: '/admin/comments/:id/edit',
+      name: 'admin-comment-edit',
+      component: () => import('@/views/admin/CommentFormView.vue'),
+      meta: { requiresAdmin: true },
+    },
     // Directors
     {
       path: '/admin/directors',

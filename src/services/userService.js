@@ -118,7 +118,7 @@ export default {
    */
   async updateUser(id, userData) {
     const mutation = `
-      mutation updateUser($id: ID!, $email: String, $roles: [String], $apiRateLimit: Int, $apiRateLimitInterval: String) {
+      mutation updateUser($id: ID!, $email: String, $roles: Iterable, $apiRateLimit: Int, $apiRateLimitInterval: String) {
         updateUser(input: {
           id: $id,
           email: $email,

@@ -33,6 +33,7 @@
                 <router-link to="/admin" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors first:rounded-t-lg">Films</router-link>
                 <router-link to="/admin/actors" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">Acteurs</router-link>
                 <router-link to="/admin/categories" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">Catégories</router-link>
+                <router-link to="/admin/comments" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">Commentaires</router-link>
                 <router-link to="/admin/directors" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors">Réalisateurs</router-link>
                 <router-link to="/admin/users" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-gray-800 transition-colors last:rounded-b-lg">Utilisateurs</router-link>
               </div>
@@ -92,7 +93,7 @@
                         class="w-full mt-2 bg-black border border-gray-700 text-xs text-gray-300 rounded-lg px-3 py-2 flex justify-between items-center hover:border-gray-500 transition-colors"
                     >
                       <span class="truncate">
-                        {{ selectedDirector ? directorsStore.directors.find(d => d.id === selectedDirector)?.name : 'Tous les réalisateurs' }}
+                        {{ selectedDirector ? getDirectorName(directorsStore.directors.find(d => d.id === selectedDirector)) : 'Tous les réalisateurs' }}
                       </span>
                       <svg
                           class="w-4 h-4 text-gray-500 transition-transform duration-200"
@@ -122,7 +123,7 @@
                           class="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
                           :class="{ 'text-red-500 font-bold': selectedDirector === dir.id }"
                       >
-                        {{ dir.name }}
+                        {{ getDirectorName(dir) }}
                       </button>
                     </div>
 
@@ -219,5 +220,10 @@ const selectDirector = (id) => {
   selectedDirector.value = id
   isDirectorDropdownOpen.value = false
   executeSearch()
+}
+
+const getDirectorName = (director) => {
+  if (!director) return ''
+  return `${director.firstname || ''} ${director.lastname || ''}`.trim()
 }
 </script>

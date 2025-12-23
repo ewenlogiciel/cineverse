@@ -65,15 +65,13 @@ export default {
   },
 
   async createDirector(directorData) {
-    // Note: Ajout de createdAt si votre entité l'exige comme pour les Acteurs
     const mutation = `
-      mutation createDirector($lastname: String!, $firstname: String!, $dob: String!, $dod: String, $createdAt: String!) {
+      mutation createDirector($lastname: String!, $firstname: String!, $dob: String!, $dod: String) {
         createDirector(input: {
           lastname: $lastname,
           firstname: $firstname,
           dob: $dob,
-          dod: $dod,
-          createdAt: $createdAt
+          dod: $dod
         }) {
           director {
             id
@@ -90,8 +88,7 @@ export default {
       lastname: directorData.lastname,
       firstname: directorData.firstname,
       dob: directorData.dob,
-      dod: directorData.dod || null,
-      createdAt: new Date().toISOString()
+      dod: directorData.dod || null
     }
 
     const data = await graphqlRequest(mutation, variables)

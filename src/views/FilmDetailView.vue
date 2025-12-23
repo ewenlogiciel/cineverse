@@ -151,6 +151,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useNotificationStore } from '@/stores/notification'
 import commentService from '@/services/commentService'
 import filmService from '@/services/filmService'
 import tmdbService from '@/services/tmdbService'
@@ -158,6 +159,7 @@ import tmdbService from '@/services/tmdbService'
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
+const notificationStore = useNotificationStore()
 
 const film = ref(null)
 const comments = ref([])
@@ -189,20 +191,31 @@ const submitComment = async () => {
     await commentService.createComment(commentData)
     newComment.value = ''
     await loadComments()
+    notificationStore.success('Commentaire ajouté avec succès')
   } catch (err) {
     console.error('Erreur:', err.response?.data)
-    alert('Erreur lors de l\'envoi.')
+    notificationStore.error('Erreur lors de l\'envoi du commentaire')
   }
 }
 
 const deleteComment = async (commentId) => {
-  if (!confirm('Voulez-vous vraiment supprimer ce commentaire?')) return
+  const confirmed = await notificationStore.confirm({
+    title: 'Supprimer le commentaire',
+    message: 'Voulez-vous vraiment supprimer ce commentaire ?',
+    confirmText: 'Supprimer',
+    cancelText: 'Annuler'
+  })
+
+  if (!confirmed) return
+
   try {
     const id = commentId.toString().includes('/') ? commentId.split('/').pop() : commentId
     await commentService.deleteComment(id)
     await loadComments()
+    notificationStore.success('Commentaire supprimé avec succès')
   } catch (err) {
     console.error('Error deleting comment:', err)
+    notificationStore.error('Erreur lors de la suppression du commentaire')
   }
 }
 
@@ -249,12 +262,9 @@ const loadFilm = async () => {
 const loadComments = async () => {
   try {
     const filmId = route.params.id
-    console.log('🔍 Chargement des commentaires pour le film ID:', filmId)
-    const loadedComments = await commentService.getComments(filmId)
-    console.log('📝 Commentaires récupérés:', loadedComments)
-    comments.value = loadedComments
+    comments.value = await commentService.getComments(filmId)
   } catch (err) {
-    console.error('❌ Erreur lors du chargement des commentaires:', err)
+    console.error('Erreur lors du chargement des commentaires:', err)
   }
 };
 
