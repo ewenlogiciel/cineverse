@@ -162,11 +162,13 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useFilmsStore } from '@/stores/films'
 import { useDirectorsStore } from '@/stores/directors'
+import { useNotificationStore } from '@/stores/notification'
 import { useRouter, useRoute } from 'vue-router'
 
 const authStore = useAuthStore()
 const filmsStore = useFilmsStore()
 const directorsStore = useDirectorsStore()
+const notificationStore = useNotificationStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -213,6 +215,7 @@ const executeSearch = () => {
 
 const handleLogout = () => {
   authStore.logout()
+  notificationStore.success('Vous avez été déconnecté avec succès')
   router.push('/')
 }
 

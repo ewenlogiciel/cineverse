@@ -59,3 +59,17 @@ npm run test:unit:dev # ou npm run test:unit pour headless
 ```sh
 npm run test:e2e:dev
 ```
+
+## Résolution des problèmes
+
+### ⚠️ Erreur 429 - Too Many Requests (Rate Limiting)
+
+Si vous rencontrez une erreur 429 lors des tests ou du développement, cela signifie que vous avez dépassé la limite de requêtes autorisées par l'API backend.
+
+**Solution :** Réinitialisez le rate limiting du backend en exécutant cette commande **dans le dossier du backend** :
+
+```sh
+php bin/console cache:clear
+```
+
+Cette commande vide le cache du backend et réinitialise les compteurs de rate limiting.
