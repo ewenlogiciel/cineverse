@@ -48,13 +48,13 @@
         <button
             type="submit"
             :disabled="commentsStore.loading"
-            class="flex-1 px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg disabled:opacity-50"
+            class="flex-1 px-6 py-3 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 disabled:opacity-50"
         >
           {{ commentsStore.loading ? 'Enregistrement...' : (isEditing ? 'Mettre à jour' : 'Créer') }}
         </button>
         <router-link
             to="/admin/comments"
-            class="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-all"
+            class="px-6 py-3 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
         >
           Annuler
         </router-link>

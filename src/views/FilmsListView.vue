@@ -40,13 +40,18 @@
       <div class="-mt-24 relative z-20 space-y-12">
 
         <div v-if="filmsStore.films.length > 0" data-test="movies-list">
-          <h2 class="text-xl md:text-2xl font-bold text-white mb-4 pl-4">
+          <h2 class="text-xl md:text-2xl font-bold text-white pl-4 md:pl-8">
             Films à l'affiche
           </h2>
 
-          <div class="flex overflow-x-auto space-x-4 pb-12 pt-4 px-2 no-scrollbar snap-x snap-mandatory">
-            <div v-for="film in filmsStore.films" :key="film.id" class="flex-none w-[160px] md:w-[220px] snap-start">
-              <FilmCard :film="film" class="h-full" />
+          <div class="relative py-12 -mx-4">
+            <div class="overflow-x-auto no-scrollbar pl-4 md:pl-8">
+              <div class="flex space-x-4 snap-x snap-mandatory py-4">
+                <div v-for="film in filmsStore.films" :key="film.id" class="flex-none w-[160px] md:w-[220px] snap-start relative">
+                  <FilmCard :film="film" class="h-full" />
+                </div>
+                <div class="flex-none w-8"></div>
+              </div>
             </div>
           </div>
         </div>

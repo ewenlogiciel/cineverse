@@ -67,13 +67,13 @@
           <div v-if="authStore.isAdmin" class="flex space-x-4">
             <router-link
                 :to="`/admin/films/${film.id}/edit`"
-                class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all transform hover:scale-105"
+                class="px-6 py-2 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
             >
               Modifier
             </router-link>
             <button
                 @click="handleDelete"
-                class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all transform hover:scale-105"
+                class="px-6 py-2 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
             >
               Supprimer
             </button>
@@ -96,7 +96,7 @@
           <button
               type="submit"
               :disabled="!newComment.trim()"
-              class="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
+              class="px-6 py-2 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Publier le commentaire
           </button>

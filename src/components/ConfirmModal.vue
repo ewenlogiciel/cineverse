@@ -9,9 +9,9 @@
       <div class="absolute inset-0 bg-black/70 backdrop-blur-sm"></div>
 
       <!-- Modal -->
-      <div class="relative bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+      <div class="relative bg-gray-800/90 border-2 border-gray-600 rounded-lg max-w-md w-full overflow-hidden">
         <!-- Header -->
-        <div class="px-6 py-5 border-b border-gray-800">
+        <div class="px-6 py-5">
           <h3 class="text-xl font-bold text-white">
             {{ notificationStore.confirmModal.title }}
           </h3>
@@ -19,22 +19,22 @@
 
         <!-- Body -->
         <div class="px-6 py-6">
-          <p class="text-gray-300 text-base leading-relaxed">
+          <p class="text-white text-base leading-relaxed">
             {{ notificationStore.confirmModal.message }}
           </p>
         </div>
 
         <!-- Footer -->
-        <div class="px-6 py-4 bg-black/40 flex gap-3 justify-end">
+        <div class="px-6 py-4 flex gap-3 justify-end">
           <button
               @click="handleCancel"
-              class="px-5 py-2.5 bg-gray-700 hover:bg-gray-600 text-white rounded-lg font-medium transition-all"
+              class="px-5 py-2.5 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
           >
             {{ notificationStore.confirmModal.cancelText }}
           </button>
           <button
               @click="handleConfirm"
-              class="px-5 py-2.5 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg"
+              class="px-5 py-2.5 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
           >
             {{ notificationStore.confirmModal.confirmText }}
           </button>

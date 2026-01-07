@@ -1,7 +1,7 @@
 <template>
   <router-link
       :to="`/films/${film.id}`"
-      class="group block relative bg-gray-900 rounded-md overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-red-900/20 hover:ring-2 hover:ring-red-500/50"
+      class="group block relative bg-gray-900 rounded-md overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-red-900/20 hover:ring-2 hover:ring-red-500/50 hover:z-50"
   >
     <div class="relative aspect-[2/3] w-full bg-gray-800">
 
