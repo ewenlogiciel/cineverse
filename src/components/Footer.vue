@@ -11,18 +11,18 @@
             Votre univers cinématographique personnel. Explorez, notez et partagez votre passion pour le septième art avec une communauté de passionnés. Rejoignez-nous pour découvrir des pépites cachées.
           </p>
           <div class="flex space-x-4">
-            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-500 hover:text-white transition-colors cursor-pointer">
-              <span class="text-xs">FB</span>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-500 hover:text-white transition-colors cursor-pointer">
-              <span class="text-xs">X</span>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-500 hover:text-white transition-colors cursor-pointer">
-              <span class="text-xs">IG</span>
-            </div>
-            <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center text-gray-500 hover:text-white transition-colors cursor-pointer">
-              <span class="text-xs">YT</span>
-            </div>
+            <a href="" class="cursor-pointer social-icon">
+              <img src="/facebook.png" alt="Facebook" class="w-5 h-5 object-contain transition-all duration-300">
+            </a>
+            <a href="" class="cursor-pointer social-icon">
+              <img src="/twitter.png" alt="Twitter/X" class="w-5 h-5 object-contain transition-all duration-300">
+            </a>
+            <a href="" class="cursor-pointer social-icon">
+              <img src="/instagram.png" alt="Instagram" class="w-5 h-5 object-contain transition-all duration-300">
+            </a>
+            <a href="" class="cursor-pointer social-icon">
+              <img src="/youtube.png" alt="YouTube" class="w-5 h-5 object-contain transition-all duration-300">
+            </a>
           </div>
         </div>
 
@@ -69,3 +69,15 @@
     </div>
   </footer>
 </template>
+
+<style scoped>
+.social-icon img {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+.social-icon:hover img {
+  filter: grayscale(0%);
+  opacity: 1;
+}
+</style>

@@ -74,11 +74,11 @@ export default {
 
     // 3. APPLICATION DES FILTRES EN JAVASCRIPT (Frontend)
 
-    // A. Filtre Recherche (Search)
+    // A. Filtre Recherche (Search) - Ne trouve que les films qui COMMENCENT par la recherche
     if (params.search) {
       const lowerSearch = params.search.toLowerCase()
       films = films.filter(film =>
-          film.name.toLowerCase().includes(lowerSearch)
+          film.name.toLowerCase().startsWith(lowerSearch)
       )
     }
 

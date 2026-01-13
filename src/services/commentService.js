@@ -1,10 +1,10 @@
-import axios from 'axios'
+import { restClient } from './api'
 
 export default {
   // Récupère TOUS les commentaires (pour l'admin)
   async getAllComments() {
     try {
-      const response = await axios.get('/api/comments')
+      const response = await restClient.get('https://mmi23f04.mmi-troyes.fr/wr506d/api/comments')
       const items = response.data['hydra:member'] || response.data.member || []
       return Array.isArray(items) ? items : []
     } catch (error) {
@@ -16,7 +16,7 @@ export default {
   // Récupère les commentaires d'un film spécifique (pour la page film)
   async getComments(filmId) {
     try {
-      const response = await axios.get('/api/comments')
+      const response = await restClient.get('https://mmi23f04.mmi-troyes.fr/wr506d/api/comments')
       const items = response.data['hydra:member'] || response.data.member || []
 
       if (!Array.isArray(items)) return []
@@ -36,7 +36,7 @@ export default {
   async getComment(id) {
     try {
       const commentId = id.toString().split('/').pop()
-      const response = await axios.get(`/api/comments/${commentId}`)
+      const response = await restClient.get(`https://mmi23f04.mmi-troyes.fr/wr506d/api/comments/${commentId}`)
       return response.data
     } catch (error) {
       console.error("Erreur lors de la récupération du commentaire", error)
@@ -46,7 +46,7 @@ export default {
 
   // Crée un nouveau commentaire
   async createComment(commentData) {
-    const response = await axios.post('/api/comments', commentData, {
+    const response = await restClient.post('https://mmi23f04.mmi-troyes.fr/wr506d/api/comments', commentData, {
       headers: {
         'Content-Type': 'application/ld+json'
       }
@@ -57,7 +57,7 @@ export default {
   // Met à jour un commentaire
   async updateComment(id, commentData) {
     const commentId = id.toString().split('/').pop()
-    const response = await axios.patch(`/api/comments/${commentId}`, commentData, {
+    const response = await restClient.patch(`https://mmi23f04.mmi-troyes.fr/wr506d/api/comments/${commentId}`, commentData, {
       headers: {
         'Content-Type': 'application/merge-patch+json'
       }
@@ -68,6 +68,6 @@ export default {
   // Supprime un commentaire
   async deleteComment(id) {
     const commentId = id.toString().split('/').pop()
-    await axios.delete(`/api/comments/${commentId}`)
+    await restClient.delete(`https://mmi23f04.mmi-troyes.fr/wr506d/api/comments/${commentId}`)
   }
 }

@@ -22,6 +22,14 @@
               Accueil
             </router-link>
 
+            <router-link
+                to="/films"
+                class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-lg transition-all"
+                active-class="text-white"
+            >
+              Films
+            </router-link>
+
             <div v-if="authStore.isAdmin" class="relative group">
               <button class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-lg transition-all flex items-center space-x-1">
                 <span>Administration</span>
@@ -201,15 +209,21 @@ const resetSearch = () => {
   selectedDirector.value = null
   sortBy.value = null
 
-  // 2. Appeler le store avec un objet vide pour récupérer les films par défaut
-  filmsStore.fetchFilms({})
+  // 2. Rediriger vers la page d'accueil
+  router.push('/')
 }
 
 const executeSearch = () => {
-  filmsStore.fetchFilms({
-    search: searchQuery.value.trim() || undefined,
-    director: selectedDirector.value || undefined,
-    sort: sortBy.value
+  // Construire l'objet de requête avec seulement les paramètres définis
+  const query = {}
+  if (searchQuery.value.trim()) query.search = searchQuery.value.trim()
+  if (selectedDirector.value) query.director = selectedDirector.value
+  if (sortBy.value) query.sort = sortBy.value
+
+  // Rediriger vers /films avec les paramètres de recherche
+  router.push({
+    path: '/films',
+    query
   })
 }
 
