@@ -1,5 +1,5 @@
 <template>
-  <nav class="bg-black/60 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50">
+  <nav class="bg-black/60 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50" role="navigation" aria-label="Navigation principale">
     <div class="max-w-[90rem] mx-auto px-4">
       <div class="flex items-center justify-between h-20">
 
@@ -12,6 +12,7 @@
             cineverse
           </router-link>
 
+          <!-- Navigation desktop -->
           <div class="hidden lg:flex items-center space-x-1 shrink-0">
             <router-link
                 to="/"
@@ -31,7 +32,10 @@
             </router-link>
 
             <div v-if="authStore.isAdmin" class="relative group">
-              <button class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-lg transition-all flex items-center space-x-1">
+              <button
+                  aria-haspopup="true"
+                  class="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white rounded-lg transition-all flex items-center space-x-1"
+              >
                 <span>Administration</span>
                 <svg class="w-4 h-4 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -48,10 +52,11 @@
             </div>
           </div>
 
+          <!-- Recherche + filtre desktop -->
           <div class="hidden md:flex items-center space-x-2 flex-1 max-w-sm ml-4">
             <div class="relative flex-1 group">
               <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -59,14 +64,19 @@
                   v-model="searchQuery"
                   type="text"
                   placeholder="Rechercher un film"
-                  class="w-full pl-11 pr-4 py-2 bg-white/5 border border-gray-700 rounded-3xl focus:outline-none focus:ring-0 focus:border-gray-700 text-white caret-white placeholder-gray-500 transition-all text-sm"
+                  aria-label="Rechercher un film"
+                  class="w-full pl-11 pr-4 py-2 bg-white/5 border border-gray-700 rounded-3xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white caret-white placeholder-gray-500 transition-all text-sm"
                   @input="handleInput"
               />
             </div>
 
             <div class="relative group/filter">
-              <button class="p-2 bg-white/5 border border-gray-700 rounded-full text-gray-500 hover:text-white hover:border-gray-500 transition-all">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button
+                  aria-label="Filtres de recherche"
+                  aria-haspopup="true"
+                  class="p-2 bg-white/5 border border-gray-700 rounded-full text-gray-500 hover:text-white hover:border-gray-500 transition-all"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
               </button>
@@ -107,6 +117,7 @@
                           class="w-4 h-4 text-gray-500 transition-transform duration-200"
                           :class="{ 'rotate-180': isDirectorDropdownOpen }"
                           fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                          aria-hidden="true"
                       >
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                       </svg>
@@ -115,9 +126,13 @@
                     <div
                         v-if="isDirectorDropdownOpen"
                         class="absolute left-0 right-0 mt-1 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto"
+                        role="listbox"
+                        aria-label="Sélectionner un réalisateur"
                     >
                       <button
                           @click="selectDirector(null)"
+                          role="option"
+                          :aria-selected="selectedDirector === null"
                           class="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-gray-800 hover:text-white transition-colors border-b border-gray-800"
                           :class="{ 'text-red-500 font-bold': selectedDirector === null }"
                       >
@@ -128,6 +143,8 @@
                           v-for="dir in directorsStore.directors"
                           :key="dir.id"
                           @click="selectDirector(dir.id)"
+                          role="option"
+                          :aria-selected="selectedDirector === dir.id"
                           class="w-full text-left px-4 py-2 text-xs text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
                           :class="{ 'text-red-500 font-bold': selectedDirector === dir.id }"
                       >
@@ -143,25 +160,189 @@
           </div>
         </div>
 
-        <div class="flex items-center space-x-8 shrink-0">
-          <template v-if="authStore.isAuthenticated">
-            <div class="flex items-center space-x-3 group cursor-default">
-              <div class="w-8 h-8 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-500 text-xs font-bold uppercase">
-                {{ (authStore.user?.username || authStore.user?.email || '?').charAt(0) }}
+        <!-- Auth desktop + hamburger mobile -->
+        <div class="flex items-center space-x-4 shrink-0">
+          <!-- Auth desktop -->
+          <div class="hidden md:flex items-center space-x-8">
+            <template v-if="authStore.isAuthenticated">
+              <div class="flex items-center space-x-3 group cursor-default">
+                <div class="w-8 h-8 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-500 text-xs font-bold uppercase">
+                  {{ (authStore.user?.username || authStore.user?.email || '?').charAt(0) }}
+                </div>
+                <span class="text-sm font-medium text-gray-400 hidden sm:block">
+                  {{ authStore.user?.username || authStore.user?.email }}
+                </span>
               </div>
-              <span class="text-sm font-medium text-gray-400 hidden sm:block">
-                {{ authStore.user?.username || authStore.user?.email }}
-              </span>
-            </div>
-            <button @click="handleLogout" class="text-sm font-medium text-gray-400 hover:text-red-500 transition-colors">Déconnexion</button>
-          </template>
-          <template v-else>
-            <router-link to="/login" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Connexion</router-link>
-            <router-link to="/register" class="text-sm font-medium text-red-600 hover:text-red-500 transition-colors">Inscription</router-link>
-          </template>
+              <button @click="handleLogout" class="text-sm font-medium text-gray-400 hover:text-red-500 transition-colors">Déconnexion</button>
+            </template>
+            <template v-else>
+              <router-link to="/login" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Connexion</router-link>
+              <router-link to="/register" class="text-sm font-medium text-red-600 hover:text-red-500 transition-colors">Inscription</router-link>
+            </template>
+          </div>
+
+          <!-- Bouton hamburger mobile -->
+          <button
+              @click="isMobileMenuOpen = !isMobileMenuOpen"
+              class="md:hidden p-2 text-gray-400 hover:text-white transition-colors"
+              :aria-expanded="isMobileMenuOpen"
+              aria-label="Menu de navigation"
+              aria-controls="mobile-menu"
+          >
+            <!-- Icône hamburger / croix -->
+            <svg v-if="!isMobileMenuOpen" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
       </div>
     </div>
+
+    <!-- Menu mobile -->
+    <Transition name="slide">
+      <div
+          v-if="isMobileMenuOpen"
+          id="mobile-menu"
+          class="md:hidden border-t border-gray-800 bg-black/95 backdrop-blur-md"
+      >
+        <div class="px-4 py-4 space-y-4">
+
+          <!-- Recherche mobile -->
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+                v-model="searchQuery"
+                type="text"
+                placeholder="Rechercher un film"
+                aria-label="Rechercher un film"
+                class="w-full pl-11 pr-4 py-3 bg-white/5 border border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white caret-white placeholder-gray-500 transition-all text-sm"
+                @input="handleInput"
+            />
+          </div>
+
+          <!-- Liens de navigation mobile -->
+          <div class="space-y-1">
+            <router-link
+                to="/"
+                @click="closeMobileMenu(); resetSearch()"
+                class="block px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+            >
+              Accueil
+            </router-link>
+
+            <router-link
+                to="/films"
+                @click="closeMobileMenu()"
+                class="block px-4 py-3 text-sm font-medium text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+            >
+              Films
+            </router-link>
+          </div>
+
+          <!-- Filtres mobile -->
+          <div class="border-t border-gray-800 pt-4">
+            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-4 mb-2">Filtres</p>
+            <div class="px-4 space-y-3">
+              <div>
+                <label class="text-xs text-gray-400 mb-1 block">Date de sortie</label>
+                <div class="flex gap-2">
+                  <button
+                      @click="updateSort('desc')"
+                      :class="sortBy === 'desc' ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-gray-700 text-gray-400'"
+                      class="flex-1 px-3 py-2 rounded-lg text-xs border transition-all"
+                  >
+                    Récent
+                  </button>
+                  <button
+                      @click="updateSort('asc')"
+                      :class="sortBy === 'asc' ? 'bg-red-600 border-red-600 text-white' : 'bg-white/5 border-gray-700 text-gray-400'"
+                      class="flex-1 px-3 py-2 rounded-lg text-xs border transition-all"
+                  >
+                    Ancien
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label class="text-xs text-gray-400 mb-1 block">Réalisateur</label>
+                <select
+                    :value="selectedDirector || ''"
+                    @change="selectDirector($event.target.value || null)"
+                    class="w-full bg-white/5 border border-gray-700 text-sm text-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    aria-label="Filtrer par réalisateur"
+                >
+                  <option value="">Tous les réalisateurs</option>
+                  <option
+                      v-for="dir in directorsStore.directors"
+                      :key="dir.id"
+                      :value="dir.id"
+                  >
+                    {{ getDirectorName(dir) }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin mobile -->
+          <div v-if="authStore.isAdmin" class="border-t border-gray-800 pt-4">
+            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest px-4 mb-2">Administration</p>
+            <div class="space-y-1">
+              <router-link @click="closeMobileMenu()" to="/admin" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Films</router-link>
+              <router-link @click="closeMobileMenu()" to="/admin/actors" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Acteurs</router-link>
+              <router-link @click="closeMobileMenu()" to="/admin/categories" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Catégories</router-link>
+              <router-link @click="closeMobileMenu()" to="/admin/comments" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Commentaires</router-link>
+              <router-link @click="closeMobileMenu()" to="/admin/directors" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Réalisateurs</router-link>
+              <router-link @click="closeMobileMenu()" to="/admin/users" class="block px-4 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors">Utilisateurs</router-link>
+            </div>
+          </div>
+
+          <!-- Auth mobile -->
+          <div class="border-t border-gray-800 pt-4">
+            <template v-if="authStore.isAuthenticated">
+              <div class="flex items-center space-x-3 px-4 mb-3">
+                <div class="w-8 h-8 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center text-red-500 text-xs font-bold uppercase">
+                  {{ (authStore.user?.username || authStore.user?.email || '?').charAt(0) }}
+                </div>
+                <span class="text-sm font-medium text-gray-300">
+                  {{ authStore.user?.username || authStore.user?.email }}
+                </span>
+              </div>
+              <button
+                  @click="handleLogout(); closeMobileMenu()"
+                  class="w-full text-left px-4 py-3 text-sm font-medium text-red-500 hover:bg-white/5 rounded-lg transition-colors"
+              >
+                Déconnexion
+              </button>
+            </template>
+            <template v-else>
+              <div class="flex gap-3 px-4">
+                <router-link
+                    to="/login"
+                    @click="closeMobileMenu()"
+                    class="flex-1 text-center py-3 text-sm font-medium text-gray-400 bg-white/5 border border-gray-700 rounded-lg hover:text-white hover:border-gray-500 transition-all"
+                >
+                  Connexion
+                </router-link>
+                <router-link
+                    to="/register"
+                    @click="closeMobileMenu()"
+                    class="flex-1 text-center py-3 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-700 rounded-lg hover:from-red-500 hover:to-red-600 transition-all"
+                >
+                  Inscription
+                </router-link>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </Transition>
   </nav>
 </template>
 
@@ -184,6 +365,7 @@ const searchQuery = ref('')
 const selectedDirector = ref(null)
 const sortBy = ref(null)
 const isDirectorDropdownOpen = ref(false)
+const isMobileMenuOpen = ref(false)
 let timeout = null
 
 onMounted(() => {
@@ -199,6 +381,15 @@ watch(() => authStore.isAuthenticated, (isAuth) => {
   }
 })
 
+// Fermer le menu mobile lors d'un changement de route
+watch(() => route.path, () => {
+  isMobileMenuOpen.value = false
+})
+
+const closeMobileMenu = () => {
+  isMobileMenuOpen.value = false
+}
+
 const handleInput = () => {
   clearTimeout(timeout)
   timeout = setTimeout(() => {
@@ -211,25 +402,19 @@ const updateSort = (order) => {
   executeSearch()
 }
 
-// === NOUVELLE FONCTION AJOUTÉE ===
 const resetSearch = () => {
-  // 1. Réinitialiser les variables locales
   searchQuery.value = ''
   selectedDirector.value = null
   sortBy.value = null
-
-  // 2. Rediriger vers la page d'accueil
   router.push('/')
 }
 
 const executeSearch = () => {
-  // Construire l'objet de requête avec seulement les paramètres définis
   const query = {}
   if (searchQuery.value.trim()) query.search = searchQuery.value.trim()
   if (selectedDirector.value) query.director = selectedDirector.value
   if (sortBy.value) query.sort = sortBy.value
 
-  // Rediriger vers /films avec les paramètres de recherche
   router.push({
     path: '/films',
     query
@@ -253,3 +438,18 @@ const getDirectorName = (director) => {
   return `${director.firstname || ''} ${director.lastname || ''}`.trim()
 }
 </script>
+
+<style scoped>
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s ease;
+  max-height: 100vh;
+  overflow: hidden;
+}
+
+.slide-enter-from,
+.slide-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+</style>

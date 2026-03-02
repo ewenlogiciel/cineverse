@@ -1,8 +1,40 @@
 <template>
   <div class="min-h-screen bg-black text-white pb-20 max-w-[90rem] mx-auto">
 
-    <div v-if="filmsStore.loading && !filmsStore.films.length" class="flex justify-center items-center h-screen">
-      <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-red-600"></div>
+    <div v-if="filmsStore.loading && !filmsStore.films.length">
+      <!-- Skeleton Hero -->
+      <div class="relative h-[80vh] w-full mb-8 rounded-2xl overflow-hidden animate-pulse">
+        <div class="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-900 to-black"></div>
+        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+        <div class="absolute bottom-[20%] left-4 md:left-12 max-w-2xl z-10 space-y-4 px-4">
+          <div class="h-10 md:h-14 bg-gray-700 rounded-lg w-80 max-w-full"></div>
+          <div class="flex items-center space-x-4">
+            <div class="h-4 bg-gray-700 rounded w-16"></div>
+            <div class="h-4 bg-gray-700 rounded w-20"></div>
+          </div>
+          <div class="space-y-2 max-w-xl">
+            <div class="h-4 bg-gray-700 rounded w-full"></div>
+            <div class="h-4 bg-gray-700 rounded w-5/6"></div>
+            <div class="h-4 bg-gray-700 rounded w-2/3"></div>
+          </div>
+          <div class="pt-4">
+            <div class="h-12 bg-gray-700 rounded w-40"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skeleton films row -->
+      <div class="-mt-24 relative z-20 px-4">
+        <div class="h-7 bg-gray-700 rounded w-48 md:ml-4 mb-4 animate-pulse"></div>
+        <div class="overflow-hidden pl-4 md:pl-8">
+          <div class="flex space-x-4 py-4">
+            <div v-for="n in 8" :key="n" class="flex-none w-[160px] md:w-[220px]">
+              <SkeletonFilmCard />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div v-else-if="filmsStore.error" class="pt-24 px-8">
@@ -72,6 +104,7 @@ import { useRoute } from 'vue-router'
 import { useFilmsStore } from '@/stores/films'
 import tmdbService from '@/services/tmdbService'
 import FilmCard from '@/components/FilmCard.vue'
+import SkeletonFilmCard from '@/components/SkeletonFilmCard.vue'
 
 const filmsStore = useFilmsStore()
 const featuredFilm = ref(null)
