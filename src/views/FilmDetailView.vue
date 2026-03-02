@@ -67,13 +67,13 @@
           <div v-if="authStore.isAdmin" class="flex space-x-4">
             <router-link
                 :to="`/admin/films/${film.id}/edit`"
-                class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all transform hover:scale-105"
+                class="px-6 py-2 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
             >
               Modifier
             </router-link>
             <button
                 @click="handleDelete"
-                class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all transform hover:scale-105"
+                class="px-6 py-2 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
             >
               Supprimer
             </button>
@@ -87,16 +87,20 @@
 
       <div v-if="authStore.isAuthenticated" class="mb-8">
         <form @submit.prevent="submitComment" class="space-y-4">
-          <textarea
-              v-model="newComment"
-              rows="4"
-              placeholder="Écrire un commentaire..."
-              class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
-          ></textarea>
+          <div>
+            <textarea
+                v-model="newComment"
+                rows="4"
+                maxlength="500"
+                placeholder="Écrire un commentaire..."
+                class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
+            ></textarea>
+            <p class="text-sm text-gray-500 text-right mt-1">{{ newComment.length }} / 500</p>
+          </div>
           <button
               type="submit"
               :disabled="!newComment.trim()"
-              class="px-6 py-3 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105"
+              class="px-6 py-2 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Publier le commentaire
           </button>
@@ -112,9 +116,28 @@
         </p>
       </div>
 
+      <!-- Tri des commentaires -->
+      <div v-if="comments.length > 1" class="flex items-center gap-2 mb-6">
+        <span class="text-sm text-gray-400">Trier :</span>
+        <button
+            @click="commentSort = 'newest'"
+            class="px-3 py-1 rounded-full text-sm transition-colors"
+            :class="commentSort === 'newest' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'text-gray-500 hover:text-gray-300'"
+        >
+          Plus récents
+        </button>
+        <button
+            @click="commentSort = 'oldest'"
+            class="px-3 py-1 rounded-full text-sm transition-colors"
+            :class="commentSort === 'oldest' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'text-gray-500 hover:text-gray-300'"
+        >
+          Plus anciens
+        </button>
+      </div>
+
       <div class="space-y-6">
         <div
-            v-for="comment in comments"
+            v-for="comment in paginatedComments"
             :key="comment.id"
             class="border-b border-gray-800 pb-6 last:border-b-0"
         >
@@ -127,15 +150,63 @@
                 {{ formatDate(comment.createdAt) }}
               </p>
             </div>
-            <button
-                v-if="authStore.user?.id === comment.user?.id || authStore.isAdmin"
-                @click="deleteComment(comment.id)"
-                class="text-red-500 hover:text-red-400 text-sm font-medium transition-colors"
-            >
-              Supprimer
-            </button>
+            <div v-if="authStore.user?.id === comment.user?.id || authStore.isAdmin" class="flex items-center gap-3">
+              <button
+                  v-if="editingCommentId !== comment.id"
+                  @click="startEditing(comment)"
+                  class="text-gray-400 hover:text-white text-sm font-medium transition-colors"
+              >
+                Modifier
+              </button>
+              <button
+                  @click="deleteComment(comment.id)"
+                  class="text-red-500 hover:text-red-400 text-sm font-medium transition-colors"
+              >
+                Supprimer
+              </button>
+            </div>
           </div>
-          <p class="text-gray-300 leading-relaxed">{{ comment.content }}</p>
+
+          <!-- Mode édition -->
+          <div v-if="editingCommentId === comment.id">
+            <textarea
+                v-model="editingContent"
+                rows="3"
+                maxlength="500"
+                class="w-full px-4 py-3 bg-white/5 border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent text-white placeholder-gray-500 transition-all"
+            ></textarea>
+            <div class="flex items-center justify-between mt-2">
+              <p class="text-sm text-gray-500">{{ editingContent.length }} / 500</p>
+              <div class="flex gap-2">
+                <button
+                    @click="cancelEditing"
+                    class="px-4 py-1.5 text-sm text-gray-400 hover:text-white transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                    @click="saveEdit(comment.id)"
+                    :disabled="!editingContent.trim()"
+                    class="px-4 py-1.5 text-sm bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Enregistrer
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mode lecture -->
+          <p v-else class="text-gray-300 leading-relaxed">{{ comment.content }}</p>
+        </div>
+
+        <!-- Bouton Voir plus -->
+        <div v-if="displayedCount < sortedComments.length" class="text-center pt-4">
+          <button
+              @click="displayedCount += commentsPerPage"
+              class="px-6 py-2 bg-white/5 border border-gray-700 text-gray-400 rounded-lg font-medium transition-all hover:bg-red-500/10 hover:border-red-500/30 hover:text-red-400"
+          >
+            Voir plus de commentaires
+          </button>
         </div>
 
         <div v-if="comments.length === 0" class="text-center py-12">
@@ -148,7 +219,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useNotificationStore } from '@/stores/notification'
@@ -169,6 +240,54 @@ const error = ref(null)
 const posterUrl = ref(null)
 const imageError = ref(false)
 
+// Comment editing
+const editingCommentId = ref(null)
+const editingContent = ref('')
+
+// Comment sorting & pagination
+const commentSort = ref('newest')
+const commentsPerPage = 5
+const displayedCount = ref(commentsPerPage)
+
+const sortedComments = computed(() => {
+  const sorted = [...comments.value]
+  sorted.sort((a, b) => {
+    const dateA = new Date(a.createdAt)
+    const dateB = new Date(b.createdAt)
+    return commentSort.value === 'newest' ? dateB - dateA : dateA - dateB
+  })
+  return sorted
+})
+
+const paginatedComments = computed(() => {
+  return sortedComments.value.slice(0, displayedCount.value)
+})
+
+const startEditing = (comment) => {
+  editingCommentId.value = comment.id
+  editingContent.value = comment.content
+}
+
+const cancelEditing = () => {
+  editingCommentId.value = null
+  editingContent.value = ''
+}
+
+const saveEdit = async (commentId) => {
+  if (!editingContent.value.trim()) return
+
+  try {
+    const id = commentId.toString().includes('/') ? commentId.split('/').pop() : commentId
+    await commentService.updateComment(id, { content: editingContent.value })
+    await loadComments()
+    cancelEditing()
+    notificationStore.success('Commentaire modifié avec succès')
+  } catch (err) {
+    console.error('Erreur lors de la modification:', err)
+    notificationStore.error('Erreur lors de la modification du commentaire')
+  }
+}
+
 const formatDate = (date) => {
   if (!date) return ''
   return new Date(date).toLocaleDateString('fr-FR', {
@@ -185,7 +304,7 @@ const submitComment = async () => {
     const commentData = {
       content: newComment.value,
       movie: `/api/movies/${route.params.id}`,
-      user: `/api/users/${authStore.user.id}` // On utilise 'user' et non 'author'
+      user: `/api/users/${authStore.user.id}`
     }
 
     await commentService.createComment(commentData)
@@ -220,12 +339,21 @@ const deleteComment = async (commentId) => {
 }
 
 const handleDelete = async () => {
-  if (!confirm('Voulez-vous vraiment supprimer ce film?')) return
+  const confirmed = await notificationStore.confirm({
+    title: 'Supprimer le film',
+    message: 'Voulez-vous vraiment supprimer ce film ?',
+    confirmText: 'Supprimer',
+    cancelText: 'Annuler'
+  })
+
+  if (!confirmed) return
   try {
     await filmService.deleteFilm(route.params.id)
+    notificationStore.success('Film supprimé avec succès')
     router.push('/')
   } catch (err) {
     console.error('Error deleting film:', err)
+    notificationStore.error('Erreur lors de la suppression du film')
   }
 }
 
@@ -271,7 +399,6 @@ const loadComments = async () => {
 onMounted(async () => {
   loading.value = true
   try {
-    // Plus de loadUserRating ici
     await Promise.all([
       loadFilm(),
       loadComments()

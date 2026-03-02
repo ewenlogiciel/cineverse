@@ -7,6 +7,11 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
+      component: () => import('@/views/HomeView.vue'),
+    },
+    {
+      path: '/films',
+      name: 'films',
       component: () => import('@/views/FilmsListView.vue'),
     },
     {
@@ -138,6 +143,11 @@ const router = createRouter({
       name: 'admin-user-edit',
       component: () => import('@/views/admin/UserFormView.vue'),
       meta: { requiresAdmin: true },
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/NotFoundView.vue'),
     },
   ],
 })
