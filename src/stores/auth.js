@@ -2,6 +2,16 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import authService from '@/services/authService'
 
+// Décode le payload d'un JWT pour en extraire les données utilisateur
+const parseJwt = (token) => {
+  try {
+    const payload = token.split('.')[1]
+    return JSON.parse(atob(payload))
+  } catch {
+    return null
+  }
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const token = ref(null)
@@ -42,10 +52,19 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await authService.login(credentials)
       token.value = response.token
-      user.value = response.user
+
+      // Utilise response.user si disponible, sinon décode le JWT
+      const userData = response.user || parseJwt(response.token)
+      if (userData) {
+        // Normalise : lexik met l'email dans "username"
+        if (!userData.email && userData.username) {
+          userData.email = userData.username
+        }
+      }
+      user.value = userData
 
       localStorage.setItem('token', response.token)
-      localStorage.setItem('user', JSON.stringify(response.user))
+      localStorage.setItem('user', JSON.stringify(userData))
 
       return response
     } catch (error) {
@@ -57,10 +76,15 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       const response = await authService.register(userData)
       token.value = response.token
-      user.value = response.user
+
+      const registeredUser = response.user || parseJwt(response.token)
+      if (registeredUser && !registeredUser.email && registeredUser.username) {
+        registeredUser.email = registeredUser.username
+      }
+      user.value = registeredUser
 
       localStorage.setItem('token', response.token)
-      localStorage.setItem('user', JSON.stringify(response.user))
+      localStorage.setItem('user', JSON.stringify(registeredUser))
 
       return response
     } catch (error) {

@@ -166,7 +166,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useFilmsStore } from '@/stores/films'
 import { useDirectorsStore } from '@/stores/directors'
@@ -187,7 +187,16 @@ const isDirectorDropdownOpen = ref(false)
 let timeout = null
 
 onMounted(() => {
-  directorsStore.fetchDirectors()
+  if (authStore.isAuthenticated) {
+    directorsStore.fetchDirectors()
+  }
+})
+
+// Charger les réalisateurs quand l'utilisateur se connecte
+watch(() => authStore.isAuthenticated, (isAuth) => {
+  if (isAuth && directorsStore.directors.length === 0) {
+    directorsStore.fetchDirectors()
+  }
 })
 
 const handleInput = () => {

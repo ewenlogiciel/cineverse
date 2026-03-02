@@ -23,12 +23,14 @@ const graphqlClient = axios.create({
 // Fonction pour gérer les erreurs d'authentification
 const handleAuthError = (error) => {
   if (error.response?.status === 401) {
+    const hadToken = !!localStorage.getItem('token')
+
     localStorage.removeItem('token')
     localStorage.removeItem('user')
 
-    // CORRECTION ICI : On ne redirige pas si on est déjà sur la page de login
-    // Cela permet à la LoginView de récupérer l'erreur et de l'afficher
-    if (!window.location.pathname.includes('/login')) {
+    // Ne redirige vers /login que si l'utilisateur était connecté (token expiré)
+    // Si pas de token, c'est une requête publique qui a échoué → pas de redirection
+    if (hadToken && !window.location.pathname.includes('/login')) {
       window.location.href = '/login'
     }
   }
